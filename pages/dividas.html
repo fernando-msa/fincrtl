@@ -70,7 +70,7 @@
 </div>
 
 <script type="module">
-  import { initAuth, state, fmt, actionAddDebt, actionDeleteDebt, actionTogglePaid, toast, handleLogout as _out } from '../js/app.js';
+  import { initAuth, state, fmt, esc, actionAddDebt, actionDeleteDebt, actionTogglePaid, toast, handleLogout as _out } from '../js/app.js';
   window.handleLogout = _out;
 
   function render() {
@@ -90,15 +90,15 @@
         ? `<span class="tag tag-red">⚠ ${d.delay||0}m atraso ${fine}</span>`
         : d.rate>=8 ? `<span class="tag tag-orange">Juros altos</span>` : `<span class="tag tag-green">OK</span>`;
       return `<tr class="${d.paid?'row-paid':''} ${d.status==='atrasada'?'row-alert':''}">
-        <td><strong>${d.name}</strong></td>
-        <td>${d.type}</td>
+        <td><strong>${esc(d.name)}</strong></td>
+        <td>${esc(d.type)}</td>
         <td class="r num">${fmt(d.total)}</td>
         <td class="r num">${fmt(d.monthly)}</td>
         <td class="r">${d.rate?d.rate+'%':'—'}</td>
         <td class="r">${d.parcels||'—'}</td>
-        <td><span class="tag ${stCls}">${stLbl}</span></td>
+        <td><span class="tag ${stCls}">${esc(stLbl)}</span></td>
         <td>${alertHtml}</td>
-        <td style="color:var(--muted);font-size:0.72rem;">${d.obs||'—'}</td>
+        <td style="color:var(--muted);font-size:0.72rem;">${esc(d.obs||'—')}</td>
         <td><div style="display:flex;gap:4px;">
           <button class="ib ok" title="${d.paid?'Reabrir':'Marcar quitado'}" onclick="doToggle('${d.id}')">${d.paid?'↩':'✓'}</button>
           <button class="ib" onclick="doDelete('${d.id}')">✕</button>

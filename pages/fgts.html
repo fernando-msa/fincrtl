@@ -51,7 +51,7 @@
   </div>
 </div>
 <script type="module">
-  import { initAuth, state, fmt, actionAddFGTS, actionDeleteFGTS, toast, handleLogout as _out } from '../js/app.js';
+  import { initAuth, state, fmt, esc, actionAddFGTS, actionDeleteFGTS, toast, handleLogout as _out } from '../js/app.js';
   window.handleLogout = _out;
   function render(){
     const el=document.getElementById('fgts-list');
@@ -60,7 +60,7 @@
     if(!state.fgts.length){el.innerHTML='<div class="empty">Nenhum contrato cadastrado.</div>';return;}
     el.innerHTML=state.fgts.map(f=>`
       <div class="fgts-card">
-        <div><strong>${f.bank}</strong><br><span style="font-size:0.7rem;color:var(--muted);">Saque bloqueado até ~${(f.year||0)+(f.years||0)} · ${f.obs||''}</span></div>
+        <div><strong>${esc(f.bank)}</strong><br><span style="font-size:0.7rem;color:var(--muted);">Saque bloqueado até ~${(f.year||0)+(f.years||0)} · ${esc(f.obs||'')}</span></div>
         <div><div style="font-size:0.65rem;color:var(--muted);">Valor recebido</div><div class="num">${fmt(f.val)}</div></div>
         <div><div style="font-size:0.65rem;color:var(--muted);">FGTS bloqueado</div><div class="num">${fmt(f.fgts)}</div></div>
         <div><div style="font-size:0.65rem;color:var(--muted);">Taxa/ano</div><div class="num">${f.rate}%</div></div>

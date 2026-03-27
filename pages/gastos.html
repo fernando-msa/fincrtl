@@ -44,7 +44,7 @@
   </div>
 </div>
 <script type="module">
-  import { initAuth, state, fmt, CAT_LABELS, actionAddExpense, actionDeleteExpense, toast, handleLogout as _out } from '../js/app.js';
+  import { initAuth, state, fmt, esc, CAT_LABELS, actionAddExpense, actionDeleteExpense, toast, handleLogout as _out } from '../js/app.js';
   window.handleLogout = _out;
   function render(){
     const tb=document.getElementById('exp-tbody');
@@ -52,9 +52,9 @@
     document.getElementById('exp-total').textContent='Total: '+fmt(total)+'/mês';
     if(!state.expenses.length){tb.innerHTML='<tr><td colspan="6" class="empty">Nenhum gasto cadastrado.</td></tr>';return;}
     tb.innerHTML=state.expenses.map(e=>`<tr>
-      <td><strong>${e.name}</strong></td><td>${CAT_LABELS[e.cat]||e.cat}</td>
-      <td>${e.person||'—'}</td><td class="r num">${fmt(e.val)}</td>
-      <td style="color:var(--muted);font-size:0.72rem;">${e.obs||'—'}</td>
+      <td><strong>${esc(e.name)}</strong></td><td>${esc(CAT_LABELS[e.cat]||e.cat)}</td>
+      <td>${esc(e.person||'—')}</td><td class="r num">${fmt(e.val)}</td>
+      <td style="color:var(--muted);font-size:0.72rem;">${esc(e.obs||'—')}</td>
       <td><button class="ib" onclick="doDel('${e.id}')">✕</button></td>
     </tr>`).join('');
   }

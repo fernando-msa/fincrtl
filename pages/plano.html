@@ -42,7 +42,7 @@
   </div>
 </div>
 <script type="module">
-  import { initAuth, state, fmt, pct, income, emergency, getActiveDebts, getTotalDebt,
+  import { initAuth, state, fmt, pct, esc, income, emergency, getActiveDebts, getTotalDebt,
            getTotalMonthly, getTotalExp, getFreeAmount, getSortedDebts, toast, handleLogout as _out } from '../js/app.js';
   window.handleLogout = _out;
 
@@ -85,7 +85,7 @@
         return `<div class="plan-item">
           <div class="plan-num">0${i+1}</div>
           <div class="plan-body">
-            <h3>${d.name}${urgNote}</h3>
+            <h3>${esc(d.name)}${urgNote}</h3>
             <p>Saldo: <strong>${fmt(d.total)}</strong>${fineNote} · Parcela mínima: ${fmt(d.monthly)} · Juros: ${d.rate||'—'}%/mês
             ${extraNote}
             <br>Previsão de quitação: <span class="go">~${months} meses</span></p>
@@ -111,7 +111,7 @@
       return `<div class="plan-item" style="padding:0.75rem 1rem;">
         <div class="plan-num" style="font-size:1.4rem;min-width:36px;">F${i+1}</div>
         <div class="plan-body">
-          <h3>${d.name} — <span class="go">~${m} meses</span></h3>
+          <h3>${esc(d.name)} — <span class="go">~${m} meses</span></h3>
           <p>Acumulado: <strong>~${cumMonths} meses</strong> do início · Libera ${fmt(d.monthly)}/mês após quitação.</p>
         </div>
       </div>`;
@@ -121,14 +121,14 @@
     // Tips
     const tips = [];
     const highRate = ordered.filter(d=>d.rate>=8);
-    if (highRate.length) tips.push(`⚡ <strong>Refinancie urgente:</strong> ${highRate.map(d=>d.name+'('+d.rate+'%/mês)').join(', ')}. Tente portabilidade de crédito para banco público ou fintech com taxa menor.`);
+    if (highRate.length) tips.push(`⚡ <strong>Refinancie urgente:</strong> ${highRate.map(d=>esc(d.name)+'('+d.rate+'%/mês)').join(', ')}. Tente portabilidade de crédito para banco público ou fintech com taxa menor.`);
     if (extra > 0) tips.push(`💰 Você tem <strong>${fmt(extra)}/mês de sobra</strong>. Cada real extra na dívida prioritária reduz significativamente o prazo total.`);
     if (state.fgts.length > 1) tips.push(`🏦 <strong>${state.fgts.length} contratos FGTS antecipados.</strong> Avalie o custo total x benefício — se as taxas forem baixas, use o capital para quitar dívidas caras.`);
     tips.push(`🤝 <strong>Negociação:</strong> Dívidas com 2-3 meses de atraso ainda têm boa margem de desconto (40-60%). Acesse o Serasa Limpa Nome ou negocie diretamente antes de completar 90 dias.`);
     tips.push(`📅 <strong>Estratégia em 4 fases:</strong> 1) Regularize atrasadas → 2) Elimine juros altos → 3) Amortize empréstimos → 4) Construa reserva e metas.`);
     if (state.goals.length) {
       const top = state.goals.filter(g=>g.prio==='alta')[0];
-      if (top) tips.push(`🎯 <strong>Meta prioritária:</strong> "${top.name}" — R$ ${fmt(top.target)}. Ao quitar a 1ª dívida, redirecione a parcela liberada para essa meta.`);
+      if (top) tips.push(`🎯 <strong>Meta prioritária:</strong> "${esc(top.name)}" — R$ ${fmt(top.target)}. Ao quitar a 1ª dívida, redirecione a parcela liberada para essa meta.`);
     }
     document.getElementById('tips-box').innerHTML = tips.map(t=>`<div class="plan-item"><div class="plan-body"><p>${t}</p></div></div>`).join('');
   }

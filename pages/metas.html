@@ -41,7 +41,7 @@
   </div>
 </div>
 <script type="module">
-  import { initAuth, state, fmt, pct, actionAddGoal, actionDeleteGoal, toast, handleLogout as _out } from '../js/app.js';
+  import { initAuth, state, fmt, pct, esc, actionAddGoal, actionDeleteGoal, toast, handleLogout as _out } from '../js/app.js';
   window.handleLogout = _out;
   const prioColor = { alta:'var(--red)', media:'var(--yellow)', baixa:'var(--green)' };
   function render(){
@@ -53,10 +53,10 @@
       const rem=(g.target||0)-(g.saved||0);
       const months=g.monthly>0?Math.ceil(rem/g.monthly):'?';
       return `<div class="goal-card" style="border-left:4px solid ${prioColor[g.prio]||'var(--border)'};">
-        <div class="goal-icon">${g.icon||'🎯'}</div>
+        <div class="goal-icon">${esc(g.icon||'🎯')}</div>
         <div class="goal-body" style="flex:1;">
-          <h4>${g.name}</h4>
-          <p>${g.desc||''}</p>
+          <h4>${esc(g.name)}</h4>
+          <p>${esc(g.desc||'')}</p>
           <div style="display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.75rem;flex-wrap:wrap;">
             <span>Alvo: <strong>${fmt(g.target)}</strong></span>
             <span>Guardado: <strong>${fmt(g.saved||0)}</strong></span>

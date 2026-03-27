@@ -43,9 +43,17 @@ export const state = {
 };
 
 const ADMIN_EMAILS = ['ribeirojunior270@gmail.com'];
+const MAX_TEXT = 180;
 
 export const fmt = (v = 0) =>
   Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+export const esc = (value = '') => String(value)
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;');
 
 export const pct = (a = 0, b = 1) => {
   const denom = Number(b || 0);
@@ -104,6 +112,18 @@ function applyAdminNavVisibility() {
     link.style.display = isAdmin ? '' : 'none';
   });
 }
+
+const normText = (value, max = MAX_TEXT) => String(value || '').trim().slice(0, max);
+const normMoney = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.round(n * 100) / 100;
+};
+const normInt = (value, fallback = 0) => {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return fallback;
+  return Math.floor(n);
+};
 
 async function loadUserData(user) {
   state.user = user;
@@ -225,13 +245,24 @@ export function toast(message, type = 'ok') {
 }
 
 export async function actionAddDebt(data = {}) {
+  const name = normText(data.name, 120);
+  if (!name) throw new Error('Informe o credor.');
   const payload = {
-    ...data,
+    name,
+    paid: Boolean(data.paid),
+    type: normText(data.type, 60) || 'Outro',
+    total: normMoney(data.total),
+    monthly: normMoney(data.monthly),
+    rate: normMoney(data.rate),
+    parcels: normInt(data.parcels, 0),
+    status: ['em_dia', 'atrasada', 'negociando'].includes(data.status) ? data.status : 'em_dia',
+    delay: normInt(data.delay, 0),
+    obs: normText(data.obs, 240),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
   const ref = await addDoc(collPath('debts'), payload);
-  state.debts.push({ id: ref.id, ...data });
+  state.debts.push({ id: ref.id, ...payload });
 }
 
 export async function actionDeleteDebt(id) {
@@ -248,9 +279,19 @@ export async function actionTogglePaid(id) {
 }
 
 export async function actionAddExpense(data = {}) {
-  const payload = { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const name = normText(data.name, 120);
+  if (!name) throw new Error('Informe a descrição.');
+  const payload = {
+    name,
+    cat: normText(data.cat, 40) || 'outro',
+    val: normMoney(data.val),
+    person: normText(data.person, 80),
+    obs: normText(data.obs, 240),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
   const ref = await addDoc(collPath('expenses'), payload);
-  state.expenses.push({ id: ref.id, ...data });
+  state.expenses.push({ id: ref.id, ...payload });
 }
 
 export async function actionDeleteExpense(id) {
@@ -259,9 +300,22 @@ export async function actionDeleteExpense(id) {
 }
 
 export async function actionAddFGTS(data = {}) {
-  const payload = { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const bank = normText(data.bank, 100);
+  if (!bank) throw new Error('Informe a instituição.');
+  const yearNow = new Date().getFullYear();
+  const payload = {
+    bank,
+    val: normMoney(data.val),
+    fgts: normMoney(data.fgts),
+    rate: normMoney(data.rate),
+    year: normInt(data.year, yearNow),
+    years: Math.max(1, normInt(data.years, 5)),
+    obs: normText(data.obs, 240),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
   const ref = await addDoc(collPath('fgts'), payload);
-  state.fgts.push({ id: ref.id, ...data });
+  state.fgts.push({ id: ref.id, ...payload });
 }
 
 export async function actionDeleteFGTS(id) {
@@ -270,9 +324,23 @@ export async function actionDeleteFGTS(id) {
 }
 
 export async function actionAddGoal(data = {}) {
-  const payload = { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const name = normText(data.name, 120);
+  if (!name) throw new Error('Informe o nome da meta.');
+  const target = normMoney(data.target);
+  if (target <= 0) throw new Error('Valor alvo da meta deve ser maior que zero.');
+  const payload = {
+    name,
+    icon: normText(data.icon, 10) || '🎯',
+    target,
+    saved: normMoney(data.saved),
+    monthly: normMoney(data.monthly),
+    prio: ['alta', 'media', 'baixa'].includes(data.prio) ? data.prio : 'media',
+    desc: normText(data.desc, 280),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
   const ref = await addDoc(collPath('goals'), payload);
-  state.goals.push({ id: ref.id, ...data });
+  state.goals.push({ id: ref.id, ...payload });
 }
 
 export async function actionDeleteGoal(id) {

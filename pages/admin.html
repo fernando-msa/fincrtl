@@ -64,6 +64,7 @@
     getCommitPct,
     loadRecentLogs,
     isAdminUser,
+    esc,
     toast,
     handleLogout as _out
   } from '../js/app.js';
@@ -97,7 +98,7 @@
 
   function renderStats() {
     const cards = [
-      { label: 'Usuário', val: state.user?.email || '—', sub: state.user?.uid || '—', cls: 'c-blue' },
+      { label: 'Usuário', val: esc(state.user?.email || '—'), sub: esc(state.user?.uid || '—'), cls: 'c-blue' },
       { label: 'Dívidas ativas', val: String(getActiveDebts().length), sub: fmt(getTotalDebt()), cls: 'c-red' },
       { label: 'Parcelas/mês', val: fmt(getTotalMonthly()), sub: getCommitPct() + '% comprometimento', cls: 'c-orange' },
       { label: 'Gastos fixos/mês', val: fmt(getTotalExp()), sub: state.expenses.length + ' gasto(s)', cls: 'c-yellow' },
@@ -129,8 +130,8 @@
       <tr>
         <td>${normalizeDate(l.createdAt)}</td>
         <td>${levelTag(l.level)}</td>
-        <td>${l.message || '—'}</td>
-        <td style="max-width:380px;white-space:pre-wrap;word-break:break-word;font-size:0.68rem;">${safeJson(l.payload)}</td>
+        <td>${esc(l.message || '—')}</td>
+        <td style="max-width:380px;white-space:pre-wrap;word-break:break-word;font-size:0.68rem;">${esc(safeJson(l.payload))}</td>
       </tr>
     `).join('');
   }
