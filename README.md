@@ -5,6 +5,8 @@
 ```
 fincrtl/
 ├── index.html              ← Página principal (Visão Geral + Login)
+├── app.js                  ← Compat legado (reexporta /js/app.js)
+├── firebase.js             ← Compat legado (reexporta /js/firebase.js)
 ├── vercel.json             ← Configuração do Vercel
 ├── firestore.rules         ← Regras de segurança do Firebase
 ├── css/
