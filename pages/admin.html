@@ -63,6 +63,7 @@
     getFreeAmount,
     getCommitPct,
     loadRecentLogs,
+    isAdminUser,
     toast,
     handleLogout as _out
   } from '../js/app.js';
@@ -159,6 +160,12 @@
   };
 
   initAuth(async (user) => {
+    if (!isAdminUser(user)) {
+      toast('Acesso admin permitido apenas para conta técnica autorizada.', 'danger');
+      window.location.href = '../index.html';
+      return;
+    }
+
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('app-shell').style.display = 'block';
     document.getElementById('user-name').textContent = state.profile?.name || user.displayName || '';
