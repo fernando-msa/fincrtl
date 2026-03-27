@@ -19,7 +19,10 @@ import {
   getDocs,
   setDoc,
   serverTimestamp,
-  addDoc
+  addDoc,
+  query,
+  orderBy,
+  limit
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
 export const state = {
@@ -73,6 +76,14 @@ async function logEvent(level, message, payload = {}) {
 
 async function loadCollection(name) {
   const snap = await getDocs(collPath(name));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function loadRecentLogs(max = 60) {
+  if (!state.user?.uid) throw new Error('Usuário não autenticado.');
+  const logsRef = collection(db, 'users', state.user.uid, 'logs');
+  const q = query(logsRef, orderBy('createdAt', 'desc'), limit(max));
+  const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
