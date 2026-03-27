@@ -82,6 +82,15 @@ Também foi adicionado o arquivo `firebase-admin-init.example.cjs` com o bootstr
 > Importante: o Admin SDK **não deve** rodar no navegador.
 > O arquivo `serviceAccountKey.json` precisa ficar fora do Git (ex: `./secrets/serviceAccountKey.json`).
 
+### Banco de logs (para diagnóstico)
+
+O app agora grava logs automaticamente no Firestore em:
+
+- `logs/{autoId}` (visão geral do sistema)
+- `users/{uid}/logs/{autoId}` (logs por usuário)
+
+Campos gravados: `level`, `message`, `payload`, `uid`, `email`, `createdAt`, `userAgent`.
+
 ---
 
 ## PASSO 3 — Deploy no Vercel
