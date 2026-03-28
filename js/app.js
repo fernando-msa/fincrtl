@@ -49,6 +49,13 @@ const MAX_TEXT = 180;
 export const fmt = (v = 0) =>
   Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
+export const getAvatarDataUrl = (name = 'U') => {
+  const safe = normText(String(name || 'U').replace(/[^\p{L}\p{N}\s]/gu, ''), 24) || 'U';
+  const first = safe.trim().charAt(0).toUpperCase() || 'U';
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='100%' height='100%' fill='%23242a35'/><text x='50%' y='56%' dominant-baseline='middle' text-anchor='middle' fill='%23f5f5f5' font-family='Inter,Arial,sans-serif' font-size='30' font-weight='700'>${first}</text></svg>`;
+  return `data:image/svg+xml,${svg}`;
+};
+
 export const esc = (value = '') => String(value)
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
@@ -114,6 +121,38 @@ function applyAdminNavVisibility() {
   document.querySelectorAll('.admin-only').forEach((link) => {
     link.style.display = isAdmin ? '' : 'none';
   });
+}
+
+function initSidebarLayout() {
+  const header = document.getElementById('app-header');
+  const nav = header?.querySelector('.nav-tabs');
+  if (!header || !nav || header.dataset.sidebarReady === '1') return;
+  header.dataset.sidebarReady = '1';
+  document.body.classList.add('layout-sidebar');
+
+  nav.querySelectorAll('.nav-tab').forEach((tab) => {
+    if (!tab.title) tab.title = tab.textContent?.trim() || 'Guia';
+  });
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'sidebar-toggle';
+  toggle.id = 'sidebar-toggle';
+  const apply = (collapsed) => {
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    toggle.textContent = collapsed ? '☰' : 'Ocultar menu';
+    toggle.title = collapsed ? 'Mostrar menu lateral' : 'Ocultar menu lateral';
+  };
+
+  const stored = localStorage.getItem('fincrtl.sidebarCollapsed') === '1';
+  apply(stored);
+  toggle.addEventListener('click', () => {
+    const collapsed = !document.body.classList.contains('sidebar-collapsed');
+    apply(collapsed);
+    localStorage.setItem('fincrtl.sidebarCollapsed', collapsed ? '1' : '0');
+  });
+
+  header.insertBefore(toggle, nav);
 }
 
 const normText = (value, max = MAX_TEXT) => String(value || '').trim().slice(0, max);
@@ -442,3 +481,9 @@ console.info('[FinCtrl] Firebase inicializado:', {
   app: app.name,
   projectId: firebaseConfig.projectId
 });
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSidebarLayout);
+} else {
+  initSidebarLayout();
+}
