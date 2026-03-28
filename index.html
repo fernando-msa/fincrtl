@@ -68,7 +68,7 @@
       <a class="nav-tab admin-only" href="pages/admin.html">🛠 Admin</a>
     </nav>
     <div class="user-chip">
-      <img id="user-photo" src="" alt="" onerror="this.style.display='none'">
+      <img id="user-photo" src="" alt="">
       <span class="uname" id="user-name"></span>
       <button class="btn btn-outline" style="padding:0.3rem 0.6rem;font-size:0.65rem;" onclick="handleLogout()">Sair</button>
       <button class="btn btn-outline" style="padding:0.3rem 0.6rem;font-size:0.65rem;" onclick="openWizard()" title="Refazer configuração">⚙</button>
@@ -100,6 +100,10 @@
     <!-- Alerts -->
     <div id="alerts-box"></div>
 
+    <!-- Recomendações -->
+    <div class="sec-head">Plano recomendado para você</div>
+    <div id="recommend-box" style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;"></div>
+
     <!-- Cashflow -->
     <div class="sec-head">Fluxo de Caixa</div>
     <div id="cashflow-box" style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;"></div>
@@ -115,7 +119,7 @@
   import { initAuth, state, fmt, pct, esc, actionSaveProfile,
            income, emergency, getActiveDebts, getTotalDebt,
            getTotalMonthly, getTotalExp, getFreeAmount, getCommitPct,
-           getPeopleMap, toast, handleLogin as _login, handleLogout as _logout
+           getPeopleMap, getAvatarDataUrl, toast, handleLogin as _login, handleLogout as _logout
          } from './js/app.js';
   import { openWizard, closeWizard } from './js/wizard.js';
 
@@ -165,17 +169,54 @@
         <div class="s-sub">${c.sub}</div>
       </div>`).join('');
 
+    const tip = (text) => `<span class="hint-tip" tabindex="0" data-tip="${esc(text)}" title="${esc(text)}">i</span>`;
+
     // Alerts
     let alerts = [], ac = 0;
-    if (atrasadas.length) { ac++; alerts.push(`<div class="alert danger"><strong>🚨 ${atrasadas.length} dívida(s) em atraso!</strong> Prioridade máxima: ${atrasadas.map(d=>esc(d.name)).join(', ')}.</div>`); }
-    if (free < 0)         { ac++; alerts.push(`<div class="alert danger"><strong>🔴 Caixa negativo: ${fmt(Math.abs(free))}/mês</strong> — renegociação urgente necessária.</div>`); }
-    else if (free < 300)  { ac++; alerts.push(`<div class="alert warn"><strong>⚠ Margem apertada: ${fmt(free)}/mês</strong> — qualquer imprevisto compromete os pagamentos.</div>`); }
-    if (cp > 50)          { ac++; alerts.push(`<div class="alert danger"><strong>🚨 ${cp}% da renda comprometida</strong> — acima da zona crítica (50%).</div>`); }
+    if (atrasadas.length) { ac++; alerts.push(`<div class="alert danger"><strong>🚨 ${atrasadas.length} dívida(s) em atraso!</strong> Prioridade máxima: ${atrasadas.map(d=>esc(d.name)).join(', ')}.${tip('Dívidas atrasadas tendem a crescer por multa/juros. Regularizar primeiro evita bola de neve.')}</div>`); }
+    if (free < 0)         { ac++; alerts.push(`<div class="alert danger"><strong>🔴 Caixa negativo: ${fmt(Math.abs(free))}/mês</strong> — renegociação urgente necessária.${tip('Caixa negativo significa que saídas fixas superam a renda. Reforce cortes e renegociação imediata.')}</div>`); }
+    else if (free < 300)  { ac++; alerts.push(`<div class="alert warn"><strong>⚠ Margem apertada: ${fmt(free)}/mês</strong> — qualquer imprevisto compromete os pagamentos.${tip('Quando sobra mensal é baixa, um gasto inesperado pode gerar atraso. Tente criar uma folga mínima.')}</div>`); }
+    if (cp > 50)          { ac++; alerts.push(`<div class="alert danger"><strong>🚨 ${cp}% da renda comprometida</strong> — acima da zona crítica (50%).${tip('Comprometimento acima de 50% indica alto risco financeiro. Reduzir parcelas e gastos é prioridade.')}</div>`); }
     const hr = getActiveDebts().filter(d=>d.rate>=8);
-    if (hr.length)        { ac++; alerts.push(`<div class="alert warn"><strong>⚡ ${hr.length} dívida(s) com juros ≥ 8%/mês</strong>: ${hr.map(d=>esc(d.name)+'('+d.rate+'%)').join(', ')}.</div>`); }
+    if (hr.length)        { ac++; alerts.push(`<div class="alert warn"><strong>⚡ ${hr.length} dívida(s) com juros ≥ 8%/mês</strong>: ${hr.map(d=>esc(d.name)+'('+d.rate+'%)').join(', ')}.${tip('Juros altos aceleram o crescimento da dívida. Se possível, concentre amortização nelas primeiro.')}</div>`); }
     if (!alerts.length)   alerts.push(`<div class="alert ok"><strong>✅ Situação sob controle.</strong> Continue seguindo o plano!</div>`);
     document.getElementById('alerts-box').innerHTML = alerts.join('');
     document.getElementById('alert-pill').textContent = ac + (ac===1?' alerta':' alertas');
+
+    // Personalized recommendations
+    const activeDebts = getActiveDebts();
+    const overdue = activeDebts.filter(d => d.status === 'atrasada');
+    const highRate = activeDebts.filter(d => Number(d.rate || 0) >= 8);
+    const method = state.profile?.method || 'avalanche';
+    const topDebt = [...activeDebts].sort((a, b) => Number(b.rate || 0) - Number(a.rate || 0))[0];
+    const recs = [];
+
+    if (free <= 0) {
+      recs.push('🔴 Seu caixa está negativo. Priorize renegociação das parcelas e corte temporário de gastos não essenciais.');
+    } else if (free < 300) {
+      recs.push(`🟠 Margem mensal curta (${fmt(free)}). Crie um teto de gastos variável para evitar novo atraso.`);
+    } else {
+      recs.push(`🟢 Você tem ${fmt(free)} de folga. Direcione esse valor para amortizar dívida prioritária.`);
+    }
+    if (overdue.length) {
+      recs.push(`🚨 Você possui ${overdue.length} dívida(s) em atraso. Foque primeiro em regularizar: ${overdue.map(d=>esc(d.name)).join(', ')}.`);
+    }
+    if (highRate.length && topDebt) {
+      recs.push(`⚡ Comece pela dívida de juros mais altos: ${esc(topDebt.name)} (${topDebt.rate}%/mês).`);
+    }
+    recs.push(`🧭 Método atual: <strong>${method === 'snowball' ? 'Bola de Neve' : 'Avalanche'}</strong>. Ajuste no botão ⚙ se quiser outro foco.`);
+    if ((state.profile?.focus || 'equilibrio') === 'cortar') {
+      recs.push('✂️ Seu foco está em reduzir gastos: revise categorias Alimentação, Transporte e Utilidades para buscar corte de 10%.');
+    }
+    if ((state.profile?.focus || 'equilibrio') === 'quitar') {
+      recs.push('💳 Seu foco está em quitação: mantenha pagamentos mínimos em todas e concentre sobra na dívida-alvo.');
+    }
+
+    document.getElementById('recommend-box').innerHTML = `
+      <ul style="margin:0;padding-left:18px;line-height:1.8;">
+        ${recs.map(r => `<li>${r}</li>`).join('')}
+      </ul>
+    `;
 
     // Cashflow
     const maxB = Math.max(inc, tm, te, emg, free, 1);
@@ -221,7 +262,7 @@
       // User chip
       document.getElementById('user-name').textContent  = state.profile?.name || user.displayName || '';
       const photo = document.getElementById('user-photo');
-      photo.src = user.photoURL || '';
+      photo.src = user.photoURL || getAvatarDataUrl(state.profile?.name || user.displayName || 'U');
 
       // Sync income/emergency fields
       document.getElementById('income-input').value    = state.profile?.income    || '';
