@@ -99,9 +99,17 @@ Foi adicionada uma API serverless em `api/slack-log.js`, acionada automaticament
 
 Pronto: erros e feedbacks enviados via `logEvent` passam a ser encaminhados para o Slack.
 
+> Alternativa (sem webhook): use **Slack Bot Token** com:
+> - `SLACK_BOT_TOKEN=xoxb-...`
+> - `SLACK_CHANNEL_ID=C0123456789`
+>
+> O endpoint tenta webhook primeiro e, se falhar, usa bot token como fallback.
+
 #### Se não chegar nada no Slack
 
-1. Verifique se a variável `SLACK_WEBHOOK_URL` está configurada no ambiente correto (Production/Preview).
+1. Verifique se as variáveis estão no ambiente correto (Production/Preview):
+   - `SLACK_WEBHOOK_URL` **ou**
+   - `SLACK_BOT_TOKEN` + `SLACK_CHANNEL_ID`
 2. Faça novo deploy após salvar a variável.
 3. Teste a saúde da rota: `GET /api/slack-log` deve retornar `{ ok: true }`.
 4. Ao enviar feedback no app, se aparecer aviso de webhook ausente/falha, confira se o webhook não foi revogado no Slack.
@@ -129,6 +137,7 @@ vercel --prod
 ### Variáveis de ambiente recomendadas (Vercel)
 
 - `SLACK_WEBHOOK_URL` → webhook de alertas operacionais no Slack.
+- `SLACK_BOT_TOKEN` + `SLACK_CHANNEL_ID` → alternativa ao webhook para envio via `chat.postMessage`.
 
 ### Configurar domínio autorizado no Firebase
 

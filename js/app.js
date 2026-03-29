@@ -162,12 +162,6 @@ export async function actionSendFeedback(message = '', payload = {}) {
   return logEvent('feedback', msg, payload);
 }
 
-export async function actionSendFeedback(message = '', payload = {}) {
-  const msg = normText(message, 240);
-  if (!msg) throw new Error('Escreva um feedback antes de enviar.');
-  await logEvent('feedback', msg, payload);
-}
-
 async function loadCollection(name) {
   const snap = await getDocs(collPath(name));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -289,8 +283,8 @@ function renderSupportModal() {
       });
       if (result?.slack?.ok) {
         toast('✅ Mensagem enviada ao suporte (Slack).', 'ok');
-      } else if (result?.slack?.skipped === 'missing_webhook') {
-        toast('⚠ Feedback salvo, mas SLACK_WEBHOOK_URL não está configurada.', 'err');
+      } else if (['missing_webhook', 'missing_slack_config'].includes(result?.slack?.skipped)) {
+        toast('⚠ Feedback salvo, mas configuração do Slack está ausente.', 'err');
       } else {
         toast('⚠ Feedback salvo no app, mas houve falha ao enviar ao Slack.', 'err');
       }
