@@ -48,6 +48,27 @@ export const state = {
 const ADMIN_EMAILS = []; // Ex: ['admin@seudominio.com']
 const ADMIN_ACCESS_MODE = 'allowlist'; // 'allowlist' | 'all-authenticated'
 const MAX_TEXT = 180;
+const APP_VERSION = 'v1.5.0';
+const RELEASE_NOTES = [
+  {
+    version: 'v1.5.0',
+    date: '2026-03-29',
+    notes: [
+      'Canal de suporte com envio de feedback/erro para o Slack.',
+      'Modal de novidades e correções por versão.',
+      'Ajustes de UX na navegação lateral.'
+    ]
+  },
+  {
+    version: 'v1.4.0',
+    date: '2026-03-28',
+    notes: [
+      'Login com e-mail/senha e recuperação de senha.',
+      'Edição de dívidas e gastos.',
+      'Recomendações personalizadas no painel.'
+    ]
+  }
+];
 
 export const fmt = (v = 0) =>
   Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -175,6 +196,143 @@ function initSidebarLayout() {
   });
 
   header.insertBefore(toggle, nav);
+}
+
+function renderSupportModal() {
+  let modal = document.getElementById('support-modal');
+  if (modal) return modal;
+
+  modal = document.createElement('div');
+  modal.id = 'support-modal';
+  modal.className = 'modal-backdrop';
+  modal.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:.1rem 0;">Suporte · Feedback e Erros</h3>
+          <div class="mini-note">Envie diretamente para o canal de suporte no Slack.</div>
+        </div>
+        <button class="icon-action" id="support-close" title="Fechar">✕</button>
+      </div>
+      <div class="fgrid" style="margin-top:.8rem;">
+        <div class="fg">
+          <label>Tipo</label>
+          <select id="support-type">
+            <option value="feedback">Sugestão / feedback</option>
+            <option value="error">Erro / problema</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Contato (opcional)</label>
+          <input id="support-contact" type="text" placeholder="Seu e-mail ou @usuario">
+        </div>
+      </div>
+      <div class="fg">
+        <label>Mensagem</label>
+        <textarea id="support-message" rows="4" placeholder="Descreva o problema ou sugestão..." style="resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.8rem;">
+        <button class="btn btn-outline" id="support-cancel">Cancelar</button>
+        <button class="btn btn-dark" id="support-send">Enviar ao suporte</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const close = () => { modal.style.display = 'none'; };
+  modal.querySelector('#support-close').addEventListener('click', close);
+  modal.querySelector('#support-cancel').addEventListener('click', close);
+  modal.addEventListener('click', (ev) => { if (ev.target === modal) close(); });
+  modal.querySelector('#support-send').addEventListener('click', async () => {
+    const type = modal.querySelector('#support-type').value;
+    const contact = normText(modal.querySelector('#support-contact').value, 120);
+    const message = normText(modal.querySelector('#support-message').value, 240);
+    if (!message) {
+      toast('Escreva uma mensagem antes de enviar.', 'err');
+      return;
+    }
+    try {
+      await actionSendFeedback(message, {
+        type,
+        contact,
+        page: window.location.pathname,
+        version: APP_VERSION
+      });
+      toast('✅ Mensagem enviada ao suporte.', 'ok');
+      modal.querySelector('#support-message').value = '';
+      close();
+    } catch (err) {
+      toast(`Erro ao enviar: ${err?.message || err}`, 'err');
+    }
+  });
+
+  return modal;
+}
+
+function renderReleaseModal() {
+  let modal = document.getElementById('release-modal');
+  if (modal) return modal;
+
+  modal = document.createElement('div');
+  modal.id = 'release-modal';
+  modal.className = 'modal-backdrop';
+  modal.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:.1rem 0;">Novidades e correções</h3>
+          <div class="mini-note">Versão atual: ${APP_VERSION}</div>
+        </div>
+        <button class="icon-action" id="release-close" title="Fechar">✕</button>
+      </div>
+      <div id="release-list" style="margin-top:.85rem;display:grid;gap:.75rem;"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#release-list').innerHTML = RELEASE_NOTES.map((item) => `
+    <div style="border:1px solid #2f3340;border-radius:10px;padding:.65rem .75rem;">
+      <div style="font-weight:700;">${item.version} <span class="mini-note">· ${item.date}</span></div>
+      <ul style="margin:.5rem 0 .2rem;padding-left:1.1rem;">
+        ${item.notes.map((n) => `<li style="margin:.2rem 0;">${esc(n)}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+
+  const close = () => { modal.style.display = 'none'; };
+  modal.querySelector('#release-close').addEventListener('click', close);
+  modal.addEventListener('click', (ev) => { if (ev.target === modal) close(); });
+  return modal;
+}
+
+function initSupportWidgets() {
+  const header = document.getElementById('app-header');
+  const chip = header?.querySelector('.user-chip');
+  if (!header || !chip || header.dataset.supportReady === '1') return;
+  header.dataset.supportReady = '1';
+
+  const supportBtn = document.createElement('button');
+  supportBtn.type = 'button';
+  supportBtn.className = 'icon-action';
+  supportBtn.title = 'Reportar feedback/erro ao suporte';
+  supportBtn.textContent = '🆘';
+  supportBtn.addEventListener('click', () => {
+    const modal = renderSupportModal();
+    modal.style.display = 'flex';
+  });
+
+  const releaseBtn = document.createElement('button');
+  releaseBtn.type = 'button';
+  releaseBtn.className = 'icon-action';
+  releaseBtn.title = 'Novidades e correções por versão';
+  releaseBtn.textContent = '🆕';
+  releaseBtn.addEventListener('click', () => {
+    const modal = renderReleaseModal();
+    modal.style.display = 'flex';
+  });
+
+  chip.insertBefore(releaseBtn, chip.firstChild);
+  chip.insertBefore(supportBtn, chip.firstChild);
 }
 
 const normText = (value, max = MAX_TEXT) => String(value || '').trim().slice(0, max);
@@ -539,7 +697,11 @@ console.info('[FinCtrl] Firebase inicializado:', {
 });
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initSidebarLayout);
+  document.addEventListener('DOMContentLoaded', () => {
+    initSidebarLayout();
+    initSupportWidgets();
+  });
 } else {
   initSidebarLayout();
+  initSupportWidgets();
 }

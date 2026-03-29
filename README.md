@@ -195,6 +195,8 @@ users/
 | Painel Admin técnico (restrito) | ✅ |
 | Alertas automáticos de risco | ✅ |
 | Recomendações personalizadas | ✅ |
+| Reporte para suporte (Slack) | ✅ |
+| Novidades/correções por versão | ✅ |
 | Painel por dependente | ✅ |
 | Fluxo de caixa visual | ✅ |
 | Sincronização em nuvem (Firestore) | ✅ |
