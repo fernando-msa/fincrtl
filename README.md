@@ -99,6 +99,13 @@ Foi adicionada uma API serverless em `api/slack-log.js`, acionada automaticament
 
 Pronto: erros e feedbacks enviados via `logEvent` passam a ser encaminhados para o Slack.
 
+#### Se não chegar nada no Slack
+
+1. Verifique se a variável `SLACK_WEBHOOK_URL` está configurada no ambiente correto (Production/Preview).
+2. Faça novo deploy após salvar a variável.
+3. Teste a saúde da rota: `GET /api/slack-log` deve retornar `{ ok: true }`.
+4. Ao enviar feedback no app, se aparecer aviso de webhook ausente/falha, confira se o webhook não foi revogado no Slack.
+
 ---
 
 ## PASSO 3 — Deploy no Vercel

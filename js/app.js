@@ -115,10 +115,31 @@ async function logEvent(level, message, payload = {}) {
     createdAt: serverTimestamp()
   };
 
+  const slackResult = { ok: false, status: 0, skipped: 'not-called' };
   try {
     const tasks = [addDoc(collection(db, 'logs'), dbData)];
     if (state.user?.uid) {
       tasks.push(addDoc(collection(db, 'users', state.user.uid, 'logs'), dbData));
+    }
+    await Promise.allSettled(tasks);
+
+    const resp = await fetch('/api/slack-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      keepalive: true
+    });
+
+    slackResult.ok = resp.ok;
+    slackResult.status = resp.status;
+    try {
+      slackResult.body = await resp.json();
+      if (slackResult.body?.skipped) slackResult.skipped = slackResult.body.skipped;
+    } catch {
+      slackResult.body = null;
+    }
+    if (!resp.ok) {
+      console.warn('[FinCtrl] Falha ao enviar log para Slack:', slackResult);
     }
     tasks.push(fetch('/api/slack-log', {
       method: 'POST',
@@ -129,8 +150,16 @@ async function logEvent(level, message, payload = {}) {
 
     await Promise.allSettled(tasks);
   } catch (err) {
-    console.warn('Falha ao gravar log no Firestore:', err?.message || err);
+    slackResult.error = err?.message || String(err);
+    console.warn('Falha ao gravar log no Firestore/Slack:', err?.message || err);
   }
+  return { ok: true, slack: slackResult };
+}
+
+export async function actionSendFeedback(message = '', payload = {}) {
+  const msg = normText(message, 240);
+  if (!msg) throw new Error('Escreva um feedback antes de enviar.');
+  return logEvent('feedback', msg, payload);
 }
 
 export async function actionSendFeedback(message = '', payload = {}) {
@@ -252,13 +281,19 @@ function renderSupportModal() {
       return;
     }
     try {
-      await actionSendFeedback(message, {
+      const result = await actionSendFeedback(message, {
         type,
         contact,
         page: window.location.pathname,
         version: APP_VERSION
       });
-      toast('✅ Mensagem enviada ao suporte.', 'ok');
+      if (result?.slack?.ok) {
+        toast('✅ Mensagem enviada ao suporte (Slack).', 'ok');
+      } else if (result?.slack?.skipped === 'missing_webhook') {
+        toast('⚠ Feedback salvo, mas SLACK_WEBHOOK_URL não está configurada.', 'err');
+      } else {
+        toast('⚠ Feedback salvo no app, mas houve falha ao enviar ao Slack.', 'err');
+      }
       modal.querySelector('#support-message').value = '';
       close();
     } catch (err) {

@@ -4,7 +4,24 @@ function sanitize(value = '') {
   return String(value || '').replace(/\s+/g, ' ').trim().slice(0, MAX_LEN);
 }
 
+async function getJsonBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString('utf8').trim();
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
 module.exports = async (req, res) => {
+  if (req.method === 'GET') {
+    res.status(200).json({ ok: true, service: 'slack-log', now: new Date().toISOString() });
+    return;
+  }
   if (req.method !== 'POST') {
     res.status(405).json({ ok: false, error: 'method_not_allowed' });
     return;
@@ -17,7 +34,7 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const body = req.body || {};
+    const body = await getJsonBody(req);
     const level = sanitize(body.level || 'info');
     const message = sanitize(body.message || 'Evento sem descrição');
     const email = sanitize(body.email || 'não informado');
@@ -43,11 +60,11 @@ module.exports = async (req, res) => {
 
     if (!slackResp.ok) {
       const errTxt = await slackResp.text();
-      res.status(502).json({ ok: false, error: 'slack_failed', details: errTxt.slice(0, 160) });
+      res.status(502).json({ ok: false, error: 'slack_failed', details: errTxt.slice(0, 160), source: 'slack' });
       return;
     }
 
-    res.status(200).json({ ok: true });
+    res.status(200).json({ ok: true, source: 'slack' });
   } catch (err) {
     res.status(500).json({ ok: false, error: 'internal_error', details: sanitize(err?.message || err) });
   }
