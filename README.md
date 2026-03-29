@@ -113,6 +113,7 @@ Pronto: erros e feedbacks enviados via `logEvent` passam a ser encaminhados para
 2. Faça novo deploy após salvar a variável.
 3. Teste a saúde da rota: `GET /api/slack-log` deve retornar `{ ok: true }`.
 4. Ao enviar feedback no app, se aparecer aviso de webhook ausente/falha, confira se o webhook não foi revogado no Slack.
+5. Na página **Diagnóstico**, use os botões **Testar API Slack** e **Enviar teste Slack** para validar healthcheck e entrega.
 
 ---
 
