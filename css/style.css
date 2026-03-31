@@ -95,6 +95,27 @@ body.layout-sidebar.sidebar-collapsed .nav-tab{
 body.layout-sidebar.sidebar-collapsed .nav-tab::first-letter{font-size:1rem}
 body.layout-sidebar.sidebar-collapsed .uname{display:none}
 body.layout-sidebar.sidebar-collapsed .sidebar-toggle{width:100%;text-align:center}
+body.layout-sidebar.sidebar-collapsed .user-chip{
+  flex-direction:column;
+  align-items:stretch;
+  gap:.4rem;
+}
+body.layout-sidebar.sidebar-collapsed .chip-actions{
+  flex-direction:column;
+  width:100%;
+}
+body.layout-sidebar.sidebar-collapsed .icon-action-text{
+  width:38px;
+  min-height:34px;
+  padding:0;
+  font-size:0;
+  justify-content:center;
+  align-self:flex-start;
+}
+body.layout-sidebar.sidebar-collapsed .icon-action-text::before{
+  content:attr(data-icon);
+  font-size:1rem;
+}
 
 #app-header{
   display:flex;
@@ -407,6 +428,18 @@ tbody tr.row-alert td{background:#2a1518}
   gap:.35rem;
   flex-wrap:wrap;
 }
+.assistant-bubble{
+  border-radius:12px;
+  padding:.6rem .7rem;
+  line-height:1.5;
+  font-size:.84rem;
+}
+.assistant-bubble.assistant{
+  background:linear-gradient(135deg, rgba(168,127,255,0.32), rgba(71,44,126,0.42));
+}
+.assistant-bubble.user{
+  background:rgba(255,255,255,0.08);
+}
 .nav-more{width:100%;}
 .nav-more > summary{
   list-style:none;
@@ -446,8 +479,8 @@ tbody tr.row-alert td{background:#2a1518}
   color:#a6a8ad;
 }
 
-#loading-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:#0b0b0d;z-index:10}
-.spinner{width:36px;height:36px;border-radius:50%;border:4px solid #2b2e37;border-top-color:#c4960a;animation:spin 1s linear infinite}
+#loading-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:radial-gradient(circle at 18% -12%, rgba(140, 80, 255, 0.22), transparent 48%),radial-gradient(circle at 90% 0%, rgba(82, 43, 150, 0.3), transparent 36%),var(--bg);z-index:10}
+.spinner{width:36px;height:36px;border-radius:50%;border:4px solid rgba(255,255,255,.16);border-top-color:var(--accent-soft);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 @media (max-width:980px){

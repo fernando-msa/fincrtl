@@ -19,6 +19,28 @@ const BRL = (value = 0) => Number(value || 0).toLocaleString('pt-BR', {
 
 let currentStep = 1;
 
+function getSmartRecommendation() {
+  const baseFree = wizardDraft.income - wizardDraft.essentials - wizardDraft.emergency;
+  const highDebtPressure = wizardDraft.debtStress === 'alto' || baseFree < 0;
+  const mediumDebtPressure = wizardDraft.debtStress === 'medio' || baseFree < 350;
+  const emergencyRatio = wizardDraft.income > 0 ? wizardDraft.emergency / wizardDraft.income : 0;
+
+  const method = highDebtPressure ? 'snowball' : 'avalanche';
+  const focus = highDebtPressure ? 'quitar' : mediumDebtPressure ? 'equilibrio' : 'cortar';
+  const profileType = highDebtPressure ? 'quitar_dividas' : wizardDraft.profileType;
+  const suggestedEmergency = wizardDraft.income > 0
+    ? Math.max(wizardDraft.emergency, Math.round(wizardDraft.income * (highDebtPressure ? 0.05 : 0.1)))
+    : wizardDraft.emergency;
+
+  const guidance = [];
+  if (highDebtPressure) guidance.push('Comece por 1 dívida menor para ganho rápido e motivação.');
+  if (!highDebtPressure) guidance.push('Priorize maior juros para economizar no longo prazo.');
+  if (emergencyRatio < 0.08) guidance.push(`Ajuste sua reserva para ~${BRL(suggestedEmergency)}/mês.`);
+  guidance.push('Revise o plano 2x por semana e acompanhe sua evolução.');
+
+  return { method, focus, profileType, suggestedEmergency, guidance };
+}
+
 function ensureModal() {
   let modal = document.getElementById(ID);
   if (modal) return modal;
@@ -124,6 +146,8 @@ function summaryHtml() {
   const baseFree = wizardDraft.income - wizardDraft.essentials - wizardDraft.emergency;
   const urgency = baseFree <= 0 || wizardDraft.debtStress === 'alto';
   const methodName = wizardDraft.method === 'snowball' ? 'Bola de Neve' : 'Avalanche';
+  const smart = getSmartRecommendation();
+  const recommendedMethod = smart.method === 'snowball' ? 'Bola de Neve' : 'Avalanche';
   const recommendations = [];
 
   if (urgency) recommendations.push('🔴 Priorize negociação de dívidas atrasadas e redução imediata de gastos variáveis.');
@@ -160,6 +184,19 @@ function summaryHtml() {
       <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;">
         ${recommendations.map((item) => `<li>${item}</li>`).join('')}
       </ul>
+    </div>
+    <div style="margin-top:12px;background:#171717;border:1px solid #2a2a2a;border-radius:10px;padding:12px;">
+      <div style="font-size:12px;color:#bdbdbd;margin-bottom:6px;">Configuração guiada inteligente (recomendada)</div>
+      <div style="font-size:13px;line-height:1.6;">
+        <div>Foco: <strong>${smart.focus === 'quitar' ? 'Quitar dívidas' : smart.focus === 'cortar' ? 'Cortar gastos' : 'Equilibrar os dois'}</strong></div>
+        <div>Método: <strong>${recommendedMethod}</strong></div>
+        <div>Perfil: <strong>${smart.profileType === 'quitar_dividas' ? 'Quitar dívidas' : smart.profileType === 'organizar_familia' ? 'Organizar família' : 'Autônomo (renda variável)'}</strong></div>
+        <div>Reserva sugerida: <strong>${BRL(smart.suggestedEmergency)}</strong>/mês</div>
+      </div>
+      <ul style="margin:.5rem 0 0;padding-left:18px;font-size:12px;line-height:1.5;">
+        ${smart.guidance.map((item) => `<li>${item}</li>`).join('')}
+      </ul>
+      <button id="wiz-apply-reco" style="margin-top:10px;padding:8px 10px;border-radius:8px;border:none;background:#9b6bff;color:#120622;font-weight:700;cursor:pointer;">Aplicar recomendação automática</button>
     </div>
   `;
 }
@@ -263,6 +300,18 @@ function renderStep(modal) {
 
   if (currentStep === 5) {
     content.innerHTML = summaryHtml();
+    const applyBtn = content.querySelector('#wiz-apply-reco');
+    if (applyBtn) {
+      applyBtn.addEventListener('click', () => {
+        const smart = getSmartRecommendation();
+        wizardDraft.focus = smart.focus;
+        wizardDraft.method = smart.method;
+        wizardDraft.profileType = smart.profileType;
+        wizardDraft.emergency = smart.suggestedEmergency;
+        toast('✅ Recomendação aplicada! Revise e clique em salvar.', 'ok');
+        renderStep(modal);
+      });
+    }
   }
 }
 

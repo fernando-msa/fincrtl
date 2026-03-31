@@ -412,38 +412,63 @@ function renderAssistantModal() {
         </div>
         <button class="icon-action" id="assistant-close" title="Fechar">✕</button>
       </div>
-      <div id="assistant-content" style="margin-top:.85rem;"></div>
+      <div id="assistant-content" style="margin-top:.85rem;display:grid;gap:.55rem;max-height:44vh;overflow:auto;"></div>
+      <div class="fg" style="margin-top:.8rem;">
+        <label>Conte o que você precisa agora</label>
+        <textarea id="assistant-input" rows="3" placeholder="Ex.: Estou com caixa negativo, o que priorizo essa semana?"></textarea>
+      </div>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;">
         <button class="btn btn-outline" data-assistant-topic="caixa">Melhorar caixa</button>
         <button class="btn btn-outline" data-assistant-topic="dividas">Priorizar dívidas</button>
         <button class="btn btn-outline" data-assistant-topic="gastos">Cortar gastos</button>
+        <button class="btn btn-dark" id="assistant-send">Enviar pergunta</button>
       </div>
     </div>
   `;
   document.body.appendChild(modal);
 
+  const pushAssistantMessage = (html, role = 'assistant') => {
+    const box = document.getElementById('assistant-content');
+    const bubble = document.createElement('div');
+    bubble.className = `assistant-bubble ${role}`;
+    bubble.innerHTML = html;
+    box.appendChild(bubble);
+    box.scrollTop = box.scrollHeight;
+  };
+
   const renderTopic = (topic = 'caixa') => {
     const free = getFreeAmount();
     const overdue = getActiveDebts().filter((d) => d.status === 'atrasada').length;
+    const topDebt = getSortedDebts()[0];
     const messages = {
-      caixa: `Sobra mensal atual: <strong>${fmt(free)}</strong>. ${free < 0 ? 'Ação: renegocie parcelas e reduza gastos variáveis hoje.' : 'Ação: direcione parte da sobra para dívida prioritária.'}`,
-      dividas: `${overdue} dívida(s) em atraso. Ação: regularize atrasadas antes de acelerar quitação das em dia.`,
-      gastos: `Comprometimento atual: <strong>${getCommitPct()}%</strong>. Ação: defina teto semanal para alimentação/transporte.`
+      caixa: `Sobra mensal atual: <strong>${fmt(free)}</strong>. ${free < 0 ? 'Ação imediata: renegocie parcelas e reduza gastos variáveis hoje.' : 'Ação imediata: direcione parte da sobra para dívida prioritária.'}`,
+      dividas: `${overdue} dívida(s) em atraso. ${topDebt ? `Comece por <strong>${esc(topDebt.name)}</strong>.` : ''} Ação: regularize atrasadas antes de acelerar quitação das em dia.`,
+      gastos: `Comprometimento atual: <strong>${getCommitPct()}%</strong>. Ação: defina teto semanal para alimentação/transporte e registre cada corte.`,
+      metas: `Meta prioritária: ${state.goals[0] ? `<strong>${esc(state.goals[0].name)}</strong>` : 'não definida'}. Ação: programe aporte mínimo fixo semanal.`
     };
-    document.getElementById('assistant-content').innerHTML = `
-      <div class="plan-item" style="margin:0;">
-        <div class="plan-body">
-          <p style="font-size:.9rem;line-height:1.6;">${messages[topic] || messages.caixa}</p>
-          <p style="margin-top:.5rem;">Se quiser, use também <strong>🆘 Suporte</strong> para falar com o time.</p>
-        </div>
-      </div>
-    `;
+    pushAssistantMessage(messages[topic] || messages.caixa, 'assistant');
+  };
+
+  const answerFromPrompt = (prompt = '') => {
+    const text = String(prompt || '').toLowerCase();
+    if (text.includes('dívida') || text.includes('divida') || text.includes('juros')) return 'dividas';
+    if (text.includes('gasto') || text.includes('cortar') || text.includes('despesa')) return 'gastos';
+    if (text.includes('meta') || text.includes('objetivo')) return 'metas';
+    return 'caixa';
   };
 
   modal.querySelector('#assistant-close').addEventListener('click', () => { modal.style.display = 'none'; });
   modal.addEventListener('click', (ev) => { if (ev.target === modal) modal.style.display = 'none'; });
   modal.querySelectorAll('[data-assistant-topic]').forEach((btn) => {
     btn.addEventListener('click', () => renderTopic(btn.dataset.assistantTopic));
+  });
+  modal.querySelector('#assistant-send').addEventListener('click', () => {
+    const input = modal.querySelector('#assistant-input');
+    const question = normText(input.value, 320);
+    if (!question) return;
+    pushAssistantMessage(esc(question), 'user');
+    renderTopic(answerFromPrompt(question));
+    input.value = '';
   });
   renderTopic('caixa');
   return modal;
@@ -461,6 +486,7 @@ function initSupportWidgets() {
   const supportBtn = document.createElement('button');
   supportBtn.type = 'button';
   supportBtn.className = 'icon-action icon-action-text';
+  supportBtn.dataset.icon = '🆘';
   supportBtn.title = 'Reportar feedback/erro ao suporte';
   supportBtn.textContent = '🆘 Ajuda';
   supportBtn.addEventListener('click', () => {
@@ -471,6 +497,7 @@ function initSupportWidgets() {
   const releaseBtn = document.createElement('button');
   releaseBtn.type = 'button';
   releaseBtn.className = 'icon-action icon-action-text';
+  releaseBtn.dataset.icon = '🆕';
   releaseBtn.title = 'Novidades e correções por versão';
   releaseBtn.textContent = '🆕 Novidades';
   releaseBtn.addEventListener('click', () => {
@@ -481,6 +508,7 @@ function initSupportWidgets() {
   const assistantBtn = document.createElement('button');
   assistantBtn.type = 'button';
   assistantBtn.className = 'icon-action icon-action-text';
+  assistantBtn.dataset.icon = '🤖';
   assistantBtn.title = 'Abrir assistente';
   assistantBtn.textContent = '🤖 Assistente';
   assistantBtn.addEventListener('click', () => {
