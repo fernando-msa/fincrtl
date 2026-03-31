@@ -64,16 +64,18 @@ fincrtl/
 
 ---
 
-## PASSO 2 — Configurar Firebase sem expor chave no repositório
+## PASSO 2 — Configurar Firebase
 
-Não coloque credenciais reais dentro de `js/firebase.js`.
+O app já possui configuração pública padrão para subir em produção.
+
+Se você quiser sobrescrever para outro projeto (dev/staging), use:
 
 1. Copie o arquivo de exemplo:
    ```bash
    cp js/firebase-config.example.js js/firebase-config.local.js
    ```
-2. Preencha o `window.__FINCTRL_FIREBASE_CONFIG__` com os dados do seu projeto.
-3. O arquivo `js/firebase-config.local.js` já está no `.gitignore` e **não deve ser commitado**.
+2. Carregue esse arquivo antes dos módulos nas páginas em que estiver desenvolvendo localmente.
+3. O arquivo `js/firebase-config.local.js` está no `.gitignore` e **não deve ser commitado**.
 
 > ⚠️ **Não publique neste README, issues ou PRs**: `serviceAccountKey.json`, tokens, webhooks, senhas ou qualquer segredo.
 >
@@ -173,6 +175,15 @@ python -m http.server 8080
 # Ou com Node.js
 npx serve .
 ```
+
+---
+
+## CI com GitHub Actions
+
+Foi adicionado workflow em `.github/workflows/ci.yml` com:
+- checagem de sintaxe JS (`node --check`);
+- validação de arquivos essenciais do app;
+- varredura de segredos com Gitleaks.
 
 ---
 
