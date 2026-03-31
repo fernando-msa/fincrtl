@@ -81,6 +81,20 @@ Se você quiser sobrescrever para outro projeto (dev/staging), use:
 >
 > O `firebaseConfig` do frontend não substitui regras de segurança: proteja acesso aos dados com `firestore.rules`.
 
+### Sobre a chave `apiKey` do Firebase Web
+
+A `apiKey` do Firebase usada no frontend **não é segredo** (ela fica exposta no navegador por definição).  
+O que protege seus dados de verdade é:
+
+1. **Regras do Firestore/Storage** corretamente configuradas (`firestore.rules`);
+2. **Authentication** exigindo usuário autenticado;
+3. **Restrições de uso no Google Cloud** para reduzir abuso da key.
+
+Checklist recomendado no Google Cloud Console:
+- Restringir a key por **HTTP referrer** (seu domínio de produção + localhost em dev);
+- Restringir APIs permitidas para a key (somente Firebase/Web APIs necessárias);
+- Monitorar uso e erros da key em métricas/logs.
+
 ### Firebase Admin (backend)
 
 Também foi adicionado o arquivo `firebase-admin-init.example.cjs` com o bootstrap do Admin SDK para uso em backend Node.js.
