@@ -1,5 +1,5 @@
-# Local/front-end config (não versionar)
-js/firebase-config.local.js
+# Local/front-end config override (não versionar)
+js/firebase-config.override.local.js
 
 # Backend/admin secrets
 secrets/

@@ -72,10 +72,10 @@ Se você quiser sobrescrever para outro projeto (dev/staging), use:
 
 1. Copie o arquivo de exemplo:
    ```bash
-   cp js/firebase-config.example.js js/firebase-config.local.js
+   cp js/firebase-config.example.js js/firebase-config.override.local.js
    ```
 2. Carregue esse arquivo antes dos módulos nas páginas em que estiver desenvolvendo localmente.
-3. O arquivo `js/firebase-config.local.js` está no `.gitignore` e **não deve ser commitado**.
+3. O arquivo `js/firebase-config.override.local.js` está no `.gitignore` e **não deve ser commitado**.
 
 > ⚠️ **Não publique neste README, issues ou PRs**: `serviceAccountKey.json`, tokens, webhooks, senhas ou qualquer segredo.
 >
