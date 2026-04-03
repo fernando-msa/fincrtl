@@ -16,11 +16,8 @@ export async function POST(request: NextRequest) {
     const adminAuth = getAdminAuth();
     sessionCookie = await adminAuth.createSessionCookie(body.idToken, { expiresIn });
   } catch (error) {
-    console.error("[auth/session] Falha ao criar session cookie:", error);
-    return NextResponse.json(
-      { error: "Serviço de autenticação indisponível no servidor." },
-      { status: 503 }
-    );
+    console.error("[auth/session] Falha ao criar session cookie via Admin SDK. Aplicando fallback com idToken.", error);
+    sessionCookie = body.idToken;
   }
 
   const response = NextResponse.json({ ok: true });

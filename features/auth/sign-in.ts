@@ -15,7 +15,8 @@ export async function signInWithGoogle() {
   });
 
   if (!response.ok) {
-    const details = await response.text().catch(() => "");
+    const payload = await response.json().catch(() => null);
+    const details = payload && typeof payload === "object" && "error" in payload ? String(payload.error) : "";
     throw new Error(details || "Falha ao criar sessão no servidor.");
   }
 
