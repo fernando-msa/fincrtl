@@ -27,7 +27,6 @@ Este projeto segue o padrão de versionamento semântico (`MAJOR.MINOR.PATCH`).
 ### Added
 - Base inicial FinCtrl v2 com App Router, autenticação e módulos financeiros.
 
-
 ## [1.1.0] - 2025-12-10
 
 ### Added
