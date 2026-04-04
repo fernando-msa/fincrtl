@@ -11,25 +11,14 @@ const debtSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  let uid: string;
-
   try {
-    uid = await getSessionUid();
-  } catch (error) {
-    console.error("[api/debts] usuário não autenticado", error);
-    return NextResponse.json({ ok: false, error: "Não autenticado." }, { status: 401 });
-  }
+    const uid = await getSessionUid();
+    const payload = debtSchema.parse(await request.json());
+    const debt = await createDebt(uid, payload);
 
-  const parsedPayload = debtSchema.safeParse(await request.json());
-  if (!parsedPayload.success) {
-    return NextResponse.json({ ok: false, error: "Payload inválido." }, { status: 400 });
-  }
-
-  try {
-    const debt = await createDebt(uid, parsedPayload.data);
     return NextResponse.json({ ok: true, debt });
   } catch (error) {
     console.error("[api/debts] erro ao criar dívida", error);
-    return NextResponse.json({ ok: false, error: "Não foi possível criar a dívida." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Não foi possível criar a dívida." }, { status: 400 });
   }
 }
