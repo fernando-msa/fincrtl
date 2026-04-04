@@ -32,7 +32,7 @@ jobs:
         run: npm cache clean --force
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@34.1.0
+        run: npm install --global vercel@37.0.0
 
       - name: Pull Vercel Environment Information
         if: ${{ env.VERCEL_TOKEN != '' }}
