@@ -11,14 +11,45 @@ const expenseSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  try {
-    const uid = await getSessionUid();
-    const payload = expenseSchema.parse(await request.json());
-    const expense = await createExpense(uid, payload);
+  let uid: string;
 
+  try {
+    uid = await getSessionUid();
+  } catch (error) {
+    console.error("[api/expenses] erro de autenticação ao criar despesa", error);
+    return NextResponse.json(
+      { ok: false, error: "Não autenticado." },
+      { status: 401 }
+    );
+  }
+
+  let payload: z.infer<typeof expenseSchema>;
+
+  try {
+    payload = expenseSchema.parse(await request.json());
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { ok: false, error: "Payload inválido.", details: error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    console.error("[api/expenses] erro ao processar payload da despesa", error);
+    return NextResponse.json(
+      { ok: false, error: "Não foi possível processar a requisição." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const expense = await createExpense(uid, payload);
     return NextResponse.json({ ok: true, expense });
   } catch (error) {
-    console.error("[api/expenses] erro ao criar despesa", error);
-    return NextResponse.json({ ok: false, error: "Não foi possível criar a despesa." }, { status: 400 });
+    console.error("[api/expenses] erro interno ao criar despesa", error);
+    return NextResponse.json(
+      { ok: false, error: "Não foi possível criar a despesa." },
+      { status: 500 }
+    );
   }
 }
