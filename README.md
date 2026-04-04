@@ -98,7 +98,7 @@ npm run test:e2e
 ## Releases semânticas
 
 - Pipeline automatizado com **Release Please** (`.github/workflows/release.yml`).
-- Tags com prefixo `v`, por exemplo: `v1.0.0`, `v1.1.0`.
+- Tags com prefixo `v`, por exemplo: `v2.0.0`, `v2.1.0`.
 - Histórico público em [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Preview por Pull Request
