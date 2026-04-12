@@ -93,6 +93,8 @@ npm run lint
 npm run typecheck
 npm run test
 npm run test:e2e
+npm run test:e2e:smoke
+npm run check:release
 ```
 
 ## Releases semânticas
@@ -113,3 +115,8 @@ npm run test:e2e
 2. Substituir mocks do dashboard por agregações reais do Firestore.
 3. Integrar Firebase Emulator Suite no fluxo local.
 4. Completar cobertura de testes (unit, integração de regras e e2e completo).
+
+
+## Checklist de release
+
+- Consulte `docs/release-checklist.md` antes de publicar em produção.
