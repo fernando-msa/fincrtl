@@ -92,3 +92,21 @@ Considerar o produto pronto para operação com cliente quando:
 - ✅ **Métricas de ativação iniciadas**: onboarding passou a registrar eventos de início, conclusão de etapa e conclusão total via endpoint dedicado.
 - ✅ **Onboarding guiado evoluído**: página de primeiros passos agora possui checklist interativo com progresso persistido localmente.
 - 🔜 **Próximo incremento P1**: publicar notas de versão em página dedicada para clientes e ampliar smoke tests de CRUD/autenticação no CI.
+
+## 7) Checagem de aderência com o projeto (12/04/2026)
+
+Após revisão do código atual, o direcionamento estratégico do documento continua válido, mas com **status operacional mais avançado** do que o diagnóstico inicial:
+
+- O App Router está ativo e os módulos principais existem em rotas dedicadas.
+- Já há endpoints API para `expenses`, `debts`, `goals` e `fgts`, indicando evolução concreta de CRUD no backend.
+- O onboarding guiado já está publicado em `Primeiros passos` e com métricas de eventos.
+
+### Decisão
+
+- ✅ **Manter este planejamento como referência oficial de execução**.
+- ▶️ **Executar o próximo incremento P1**: notas de versão públicas + gate mínimo de qualidade por deploy.
+
+### Ação aplicada nesta etapa
+
+- Página pública **`/releases`** adicionada para exibir “Novidades da versão” a partir do `CHANGELOG.md`.
+- Landing page e onboarding passaram a apontar explicitamente para essa página.
