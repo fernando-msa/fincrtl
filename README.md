@@ -81,20 +81,61 @@ types/
 
 ## Rodando localmente
 
+Requisito de runtime: Node `24.13.1` (ver `.nvmrc`).
+
+No Windows PowerShell, prefira `npm.cmd` para evitar bloqueio por ExecutionPolicy.
+
 ```bash
-npm install
-npm run dev
+npm.cmd ci
+npm.cmd run dev
+```
+
+Para habilitar os hooks do Husky no clone local:
+
+```bash
+npm.cmd run prepare
 ```
 
 ## Scripts úteis
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
-npm run test:e2e
-npm run test:e2e:smoke
+npm.cmd run lint
+npm.cmd run typecheck
+npm.cmd run test
+npm.cmd run test:watch
+npm.cmd run test:e2e
+npm.cmd run test:e2e:smoke
+npm.cmd run validate
+npm.cmd run validate:local
 ```
+
+## Loop local de validação
+
+Use este ciclo curto para evoluir com segurança:
+
+1. Desenvolvimento contínuo com `npm.cmd run test:watch`.
+2. Antes de commit/push, rode `npm.cmd run validate`.
+3. Para validar fluxo mínimo da aplicação, rode `npm.cmd run validate:local`.
+
+Notas:
+
+- `validate` roda lint + typecheck + testes unitários.
+- `validate:local` roda `validate` e depois smoke e2e.
+- O hook `pre-push` executa `npm run validate` automaticamente.
+
+## Troubleshooting (Windows)
+
+Se ocorrer erro de instalação parcial (`ENOTEMPTY`/`EPERM`) em `node_modules`:
+
+```powershell
+cmd /c rmdir /s /q node_modules
+npm.cmd cache clean --force
+npm.cmd ci
+```
+
+Se aparecer erro de script bloqueado (`npm.ps1`):
+
+- Use `npm.cmd` em vez de `npm`.
 
 ## Releases semânticas
 

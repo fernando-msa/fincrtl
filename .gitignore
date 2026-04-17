@@ -15,3 +15,6 @@ serviceAccountKey.json
 # Logs
 *.log
 tsconfig.tsbuildinfo
+node_modules
+.next/
+test-results/
