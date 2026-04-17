@@ -13,7 +13,7 @@ export default async function PlanPage() {
   try {
     uid = await getSessionUid();
   } catch (error) {
-    console.error("[plan] sessão sem UID válido, fallback para legado:", error);
+    console.error("[plan] sessão sem UID válido. Redirecionando para login:", error);
     redirect("/dashboard");
   }
 
@@ -21,7 +21,7 @@ export default async function PlanPage() {
   try {
     debts = await listDebts(uid);
   } catch (error) {
-    console.error("[plan] falha ao buscar dívidas no Firestore, fallback para legado:", error);
+    console.error("[plan] falha ao buscar dívidas no Firestore. Redirecionando para dashboard:", error);
     redirect("/dashboard");
   }
 

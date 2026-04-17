@@ -1,9 +1,10 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { requireSession } from "@/lib/firebase/auth";
 
 export const dynamic = "force-dynamic";
 
-const links: Array<{ href: string; label: string }> = [
+const links: Array<{ href: Route; label: string }> = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/expenses", label: "Despesas" },
   { href: "/debts", label: "Dívidas" },
@@ -26,7 +27,7 @@ export default async function PrivateLayout({ children }: { children: React.Reac
           {links.map(({ href, label }) => (
             <Link
               className="whitespace-nowrap rounded border border-slate-200 px-3 py-2 text-sm hover:bg-slate-100 md:block md:border-transparent"
-              href={href as any}
+              href={href}
               key={href}
             >
               {label}

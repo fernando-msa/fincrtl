@@ -6,6 +6,12 @@
 
 Aplicação web de controle financeiro pessoal com autenticação segura, isolamento por usuário e arquitetura escalável usando Next.js + Firebase.
 
+## Status de consolidação
+
+- A aplicação canônica está consolidada no App Router (`app/`).
+- URLs legadas HTML (`/pages/*.html` e `/*.html`) são redirecionadas para rotas canônicas.
+- O build web está restrito a páginas TypeScript (`.ts`/`.tsx`) para reduzir risco de regressão do legado.
+
 ## Stack
 
 - Next.js 16 (App Router)
@@ -70,6 +76,11 @@ lib/firebase/
 server/
 types/
 ```
+
+## Rotas canônicas
+
+- Públicas: `/landing`, `/login`, `/releases`
+- Privadas: `/dashboard`, `/expenses`, `/debts`, `/goals`, `/fgts`, `/plan`, `/diagnostics`, `/settings`, `/getting-started`
 
 ## Segurança adotada
 
@@ -151,7 +162,7 @@ Se aparecer erro de script bloqueado (`npm.ps1`):
 
 ## Roadmap sugerido
 
-1. Implementar CRUD completo em `expenses`, `debts`, `goals` e `fgts` com Server Actions.
-2. Substituir mocks do dashboard por agregações reais do Firestore.
-3. Integrar Firebase Emulator Suite no fluxo local.
-4. Completar cobertura de testes (unit, integração de regras e e2e completo).
+1. Migrar referências documentais restantes de `pages/*.html` para rotas canônicas do App Router.
+2. Integrar Firebase Emulator Suite no fluxo local para testes determinísticos.
+3. Expandir cobertura de testes (integração de repositórios + e2e autenticado).
+4. Planejar remoção definitiva dos arquivos legados após janela de estabilização.

@@ -38,7 +38,7 @@ export default async function DiagnosticsPage() {
   try {
     uid = await getSessionUid();
   } catch (error) {
-    console.error("[diagnostics] sessão sem UID válido, fallback para legado:", error);
+    console.error("[diagnostics] sessão sem UID válido. Redirecionando para login:", error);
     redirect("/dashboard");
   }
 
@@ -47,7 +47,7 @@ export default async function DiagnosticsPage() {
   try {
     [debts, expenses] = await Promise.all([listDebts(uid), listExpenses(uid)]);
   } catch (error) {
-    console.error("[diagnostics] falha ao buscar dados no Firestore, fallback para legado:", error);
+    console.error("[diagnostics] falha ao buscar dados no Firestore. Redirecionando para dashboard:", error);
     redirect("/dashboard");
   }
 
