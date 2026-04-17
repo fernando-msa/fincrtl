@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getSettingsProfile, updateSettingsProfile } from "@/server/repositories/settings-repository";
 
-const getAdminDbMock = vi.fn();
+const mocks = vi.hoisted(() => ({
+  getAdminDbMock: vi.fn()
+}));
 
 vi.mock("@/lib/firebase/admin", () => ({
-  getAdminDb: getAdminDbMock
+  getAdminDb: mocks.getAdminDbMock
 }));
 
 describe("settings-repository", () => {
@@ -20,7 +22,7 @@ describe("settings-repository", () => {
     const userDoc = { collection: vi.fn().mockReturnValue(settingsCollection) };
     const usersCollection = { doc: vi.fn().mockReturnValue(userDoc) };
 
-    getAdminDbMock.mockReturnValue({
+    mocks.getAdminDbMock.mockReturnValue({
       collection: vi.fn().mockReturnValue(usersCollection)
     });
 
@@ -51,7 +53,7 @@ describe("settings-repository", () => {
     const userDoc = { collection: vi.fn().mockReturnValue(settingsCollection) };
     const usersCollection = { doc: vi.fn().mockReturnValue(userDoc) };
 
-    getAdminDbMock.mockReturnValue({
+    mocks.getAdminDbMock.mockReturnValue({
       collection: vi.fn().mockReturnValue(usersCollection)
     });
 
@@ -73,7 +75,7 @@ describe("settings-repository", () => {
     const userDoc = { collection: vi.fn().mockReturnValue(settingsCollection) };
     const usersCollection = { doc: vi.fn().mockReturnValue(userDoc) };
 
-    getAdminDbMock.mockReturnValue({
+    mocks.getAdminDbMock.mockReturnValue({
       collection: vi.fn().mockReturnValue(usersCollection)
     });
 

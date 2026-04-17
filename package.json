@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
+    "lint:staged": "lint-staged",
     "test:e2e:smoke": "playwright test tests/e2e/smoke.spec.ts",
     "test:e2e:install": "playwright install --with-deps chromium",
     "validate": "npm run lint && npm run typecheck && npm run test",
