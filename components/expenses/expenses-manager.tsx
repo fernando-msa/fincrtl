@@ -65,6 +65,10 @@ export function ExpensesManager({ initialExpenses }: { initialExpenses: Expense[
         throw new Error("Informe a competência.");
       }
 
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(form.competenceDate)) {
+        throw new Error("Use o formato de competência YYYY-MM.");
+      }
+
       if (editingId) {
         const response = await fetch(`/api/expenses/${editingId}`, {
           method: "PATCH",
@@ -173,9 +177,12 @@ export function ExpensesManager({ initialExpenses }: { initialExpenses: Expense[
             Competência
             <input
               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
+              inputMode="numeric"
+              pattern="\\d{4}-(0[1-9]|1[0-2])"
               placeholder="2026-04"
               required
-              type="month"
+              title="Use o formato YYYY-MM"
+              type="text"
               value={form.competenceDate}
               onChange={(event) => setForm((current) => ({ ...current, competenceDate: event.target.value }))}
             />

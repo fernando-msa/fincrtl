@@ -5,6 +5,7 @@ O **FinCtrl** é uma aplicação web de organização financeira pessoal, com fo
 ## Objetivo
 
 Ajudar pessoas e famílias a:
+
 - entender sua situação financeira atual;
 - registrar dívidas, gastos fixos e metas;
 - acompanhar evolução mensal;
@@ -13,41 +14,50 @@ Ajudar pessoas e famílias a:
 ## Principais tópicos do projeto
 
 ### 1) Autenticação e segurança
+
 - Login com Google e com e-mail/senha via Firebase Authentication.
 - Isolamento de dados por usuário no Firestore.
 - Regras de segurança em `firestore.rules`.
 
 ### 2) Onboarding financeiro
+
 - Wizard inicial para coleta de informações essenciais.
 - Cadastro de renda, reserva de emergência e dependentes.
 
 ### 3) Gestão de dívidas
+
 - Registro de dívidas/empréstimos com parcelas, taxa e status.
 - Edição, exclusão e marcação de pagamento.
 - Base para estratégias Avalanche e Bola de Neve.
 
 ### 4) Gastos fixos
+
 - Cadastro de despesas recorrentes por categoria e responsável.
 - Visão consolidada para melhorar planejamento mensal.
 
 ### 5) FGTS antecipado
+
 - Controle de contratos de antecipação de FGTS.
 - Registro de banco, valores, taxas e período.
 
 ### 6) Metas financeiras
+
 - Metas com valor alvo, valor guardado e prioridade.
 - Acompanhamento de progresso em percentual.
 
 ### 7) Plano de ação
+
 - Recomendações práticas a partir dos dados do usuário.
 - Apoio para priorização de pagamentos e organização.
 
 ### 8) Diagnóstico e observabilidade
+
 - Página de diagnóstico com estatísticas e logs.
 - Registro de eventos no Firestore (`logs` globais e por usuário).
 - Integração com Slack para feedbacks e alertas operacionais.
 
 ### 9) Administração técnica
+
 - Painel administrativo com acesso controlado por e-mail.
 - Recursos para suporte e monitoramento do ambiente.
 

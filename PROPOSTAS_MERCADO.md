@@ -5,6 +5,7 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 ## 1) Melhorias imediatas por tela do app
 
 ### 1.1 `index.html` + onboarding (`js/wizard.js`)
+
 **Objetivo:** aumentar ativação na 1ª semana.
 
 - Adicionar opção de perfil no onboarding: `quitar_dividas`, `organizar_familia`, `autonomo_renda_variavel`.
@@ -14,6 +15,7 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 **KPI principal:** taxa de onboarding concluído (meta: +20%).
 
 ### 1.2 Dívidas (`pages/dividas.html`)
+
 **Objetivo:** reduzir inadimplência e acelerar quitação.
 
 - Criar campo de vencimento por parcela e alerta de risco de atraso.
@@ -23,6 +25,7 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 **KPI principal:** redução de dívidas em atraso (meta: -25% em 90 dias).
 
 ### 1.3 Gastos (`pages/gastos.html`)
+
 **Objetivo:** elevar consciência de consumo e previsibilidade.
 
 - Introduzir orçamento por envelope (50-30-20 como padrão, com personalização).
@@ -32,6 +35,7 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 **KPI principal:** queda de gasto variável evitável (meta: -10% em 60 dias).
 
 ### 1.4 Metas (`pages/metas.html`)
+
 **Objetivo:** aumentar retenção com senso de progresso.
 
 - Implementar check-ins semanais de aporte com lembrete inteligente.
@@ -41,6 +45,7 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 **KPI principal:** percentual de metas com aporte mensal (meta: +30%).
 
 ### 1.5 Plano (`pages/plano.html`)
+
 **Objetivo:** transformar diagnóstico em ação recorrente.
 
 - Inserir “Missões da Semana” com 3 tarefas de alto impacto.
@@ -50,6 +55,7 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 **KPI principal:** retenção D30 (meta: +15%).
 
 ### 1.6 Diagnóstico (`pages/diagnostico.html`)
+
 **Objetivo:** aumentar clareza e percepção de valor.
 
 - Criar **Score de Saúde Financeira (0–100)** com subitens: fluxo de caixa, dívida/renda, reserva, consistência.
@@ -82,15 +88,18 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 ## 3) Pacotes de customização (para segmentação comercial)
 
 ### Pacote Starter (gratuito)
+
 - Cadastro manual de dívidas, gastos e metas.
 - Diagnóstico básico e plano padrão.
 
 ### Pacote Pro
+
 - Alertas preditivos e score completo.
 - Missões semanais personalizadas.
 - Simulador de renegociação e previsões.
 
 ### Pacote Família
+
 - Múltiplos membros com permissões.
 - Metas compartilhadas e visão por responsável.
 - Timeline de alterações para transparência doméstica.
@@ -100,17 +109,20 @@ Este guia foi revisado para ficar **mais prático e acionável**, conectando cad
 ## 4) Backlog priorizado (impacto x esforço)
 
 ### Onda 1 — 0 a 8 semanas (rápido retorno)
+
 1. Missões semanais no plano.
 2. Score financeiro no diagnóstico.
 3. Alertas de vencimento de dívida.
 4. Perfis no onboarding.
 
 ### Onda 2 — 8 a 16 semanas
+
 1. Orçamento por envelope.
 2. Simulador de renegociação.
 3. Insights de variação mensal por categoria.
 
 ### Onda 3 — 16 a 24 semanas
+
 1. Copiloto IA com recomendações acionáveis.
 2. Canal WhatsApp para lembretes e resumos.
 3. Modo Família completo.
